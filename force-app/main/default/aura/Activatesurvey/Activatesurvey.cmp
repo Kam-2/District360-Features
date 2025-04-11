@@ -1,0 +1,5 @@
+<aura:component implements="flexipage:availableForRecordHome,flexipage:availableForAllPageTypes,force:appHostable,force:hasRecordId,lightning:actionOverride">
+
+	   <c:generateActiveSurveyLink recordId="{!v.recordId}" objectName="Survey_Builder__c"/>
+
+</aura:component>

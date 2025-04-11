@@ -1,0 +1,213 @@
+<template>
+    <div>
+        <lightning-card class="n_survey_form_create n_survey_form_create_seperate">
+            <div class="new-card">
+                <!-- Survey Name Input -->
+                <div class="card-row-add">
+                    <lightning-input class="strong-text survey_name" type="text" label="Survey Name" value={Surveyname}
+                        onchange={handleChange} data-id="Surveyname" required></lightning-input>
+                </div>
+                <!-- Submit Another Response Checkbox -->
+                <div class="card-row-add">
+                    <lightning-input type="checkbox" label="Submit another response" 
+                        checked={submitAnotherResponse} onchange={handleCheckboxChangeres} data-id="submitAnotherResponse">
+                    </lightning-input>
+                </div>
+                <!-- Rows (Questions) -->
+                <div class="slds-m-around_medium" style="margin-left: 0px;">
+                    <template if:true={rows}>
+                        <template for:each={rows} for:item="row" for:index="index">
+                            <div class="slds-grid slds-m-bottom_small n_survey_form_create_in" key={row.id}>
+                                
+                                <!-- Order Field - Only shown for parent questions -->
+                                <template if:true={row.isParentQuestion}>
+                                    <lightning-input type="number" label="Order of Question" value={row.order} data-index={index}
+                                        onchange={handleOrderChange} style="width: 150px;"></lightning-input>
+                                </template>
+                                
+                                <!-- Question Input -->
+                                <lightning-input type="text" label="Question" value={row.question} data-index={index}
+                                    onchange={handleInputChange} style="width: 300px;"></lightning-input>
+                                
+                                <!-- Required Field Checkbox -->
+                                <lightning-input type="checkbox" label="Required" checked={row.isRequired}
+                                    data-index={index} onchange={handleRequiredChange}>
+                                </lightning-input>
+                                
+                                <!-- Select Type (Combobox) -->
+                                <lightning-combobox name="combobox" label="Select an Option"
+                                    value={row.questiontype.datatype} placeholder="Choose an option"
+                                    options={questionDataTypes} data-index={index} onchange={handledataChange}>
+                                </lightning-combobox>
+                                
+                                <!-- Rest of the template remains the same -->
+                                <template if:true={row.isCheckboxSelected}>
+                                    <!-- Checkbox Group -->
+                                    <lightning-checkbox-group name="checkboxGroup" label="Select Multiple Options"
+                                        options={row.questiontype.options} value={row.checkboxSelectedValues}
+                                        data-index={index} onchange={handleCheckboxChange}>
+                                    </lightning-checkbox-group>
+                                    <!-- Add New Checkbox Option -->
+                                    <div class="slds-grid slds-m-top_small">
+                                        <div class="slds-col slds-size_1-of-2">
+                                            <lightning-input label="Add New Checkbox Option" value={newCheckboxOption}
+                                                onchange={handleNewCheckboxOptionChange} data-index={index}
+                                                placeholder="Enter new checkbox option"></lightning-input>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-2">
+                                            <lightning-button label="Add Checkbox Option" onclick={addNewCheckboxOption}
+                                                data-index={index} class="slds-m-bottom_small"></lightning-button>
+                                            <lightning-button label="Delete Last Option"
+                                                onclick={deleteLastCheckboxOption} data-index={index}
+                                                class="slds-m-bottom_small"></lightning-button>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template if:true={row.isSurveyNameSelected}>
+                                    <div class="slds-col slds-size_1-of-3 slds-p-right_small">
+                                        <lightning-dual-listbox name="combobox" label="Select Options"
+                                            source-label="Available Options" selected-label="Selected Options"
+                                            options={row.questiontype.options} value={row.selectedValues}
+                                            data-index={index} onchange={handleDualListboxChange}>
+                                        </lightning-dual-listbox>
+                                    </div>
+                                    <!-- Add New Option Section -->
+                                    <div class="slds-grid slds-m-top_small">
+                                        <div class="slds-col slds-size_1-of-2">
+                                            <lightning-input label="Add New Option" value={newOption}
+                                                onchange={handleNewOptionChange} placeholder="Enter new option">
+                                            </lightning-input>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-2">
+                                            <lightning-button label="Add Option" onclick={addNewOption}
+                                                data-index={index} class="slds-m-bottom_small">
+                                            </lightning-button>
+                                            <lightning-button label="Delete Last Option"
+                                                onclick={deleteLastDualistOption} data-index={index}>
+                                            </lightning-button>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template if:true={row.isradiobuttonSelected}>
+                                    <!-- Radio Button Group -->
+                                    <div class="slds-m-bottom_small">
+                                        <lightning-combobox name="radioGroup" label="Select an Option"
+                                            options={row.questiontype.options} value={row.radioSelectedValue}
+                                            onchange={handleRadioChange} data-index={index}>
+                                        </lightning-combobox>
+                                    </div>
+                                    <!-- Add New Picklist Option Section -->
+                                    <div class="slds-grid slds-m-top_small">
+                                        <div class="slds-col slds-size_1-of-2">
+                                            <lightning-input label="Add New Option" value={newRadioOption}
+                                                onchange={handleNewRadioOptionChange} placeholder="Enter new option">
+                                            </lightning-input>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-2">
+                                            <lightning-button label="Add Option" onclick={addNewRadioOption}
+                                                data-index={index} class="slds-m-bottom_small">
+                                            </lightning-button>
+                                            <lightning-button label="Delete Last Option" onclick={deleteLastRadioOption}
+                                                data-index={index} class="slds-button_destructive">
+                                            </lightning-button>
+                                        </div>
+                                    </div>
+                                </template>
+                                <!-- Dependent Question Button -->
+                                <template if:true={row.isParentQuestion}>
+                                    <div class="slds-m-top_medium">
+                                        <lightning-button label="Add Dependent Question" onclick={addDependentQuestion} data-index={index}
+                                           class="slds-m-bottom_small" >
+                                        </lightning-button><!---->
+                                    </div>
+                                </template>
+                                <!-- added new code on 17-02-2025-->
+                                <template if:true={row.dependentQuestions}>
+                                    <template for:each={row.dependentQuestions} for:item="depQuestion" for:index="depIndex">
+                                        <div class="slds-m-left_medium slds-m-top_medium depeQues" key={depQuestion.id}>
+                                            <div class="slds-grid slds-grid_vertical">
+                                                <lightning-input type="text" label="Dependent Question"
+                                                    value={depQuestion.question} data-main-index={index}
+                                                    data-dep-index={depIndex}
+                                                    onchange={handleDependentQuestionChange} style="width: 300px;">
+                                                </lightning-input>
+                                                <lightning-input type="checkbox" label="Required"
+                                                    checked={depQuestion.isRequired} data-main-index={index}
+                                                    data-dep-index={depIndex}
+                                                    onchange={handleDependentRequiredChange}>
+                                                </lightning-input>
+                                                <lightning-combobox name="combobox" label="Select an Option"
+                                                    value={depQuestion.questiontype.datatype}
+                                                    placeholder="Choose an option" options={questionDataTypes}
+                                                    data-main-index={index} data-dep-index={depIndex}
+                                                    onchange={handleDependentDataChange}>
+                                                </lightning-combobox>
+                                                <!-- Options for dependent question -->
+                                                <template if:true={depQuestion.isPicklistType}>
+                                                    <div class="slds-m-top_medium n_survey_form_create_dd" style="margin-left: 0;margin-right: auto;width: 100%;">
+                                                        <lightning-combobox name="depPicklist" label="Select an Option"
+                                                            options={depQuestion.questiontype.options}
+                                                            value={depQuestion.selectedValue}
+                                                            data-main-index={index} data-dep-index={depIndex}
+                                                            onchange={handleDependentPicklistChange}>
+                                                        </lightning-combobox>
+                                                        <!-- Add New Option Section for Dependent Question -->
+                                                        <div class="slds-grid slds-m-top_small">
+                                                            <div class="slds-col slds-size_1-of-2">
+                                                                <lightning-input label="Add New Option"
+                                                                    value={depQuestion.newOption}
+                                                                    onchange={handleNewDependentOptionChange}
+                                                                    data-main-index={index} data-dep-index={depIndex}
+                                                                    placeholder="Enter new option">
+                                                                </lightning-input>
+                                                            </div>
+                                                            <div class="slds-col slds-size_1-of-2">
+                                                                <lightning-button label="Add Option"
+                                                                    onclick={addNewDependentOption}
+                                                                    data-main-index={index} data-dep-index={depIndex}
+                                                                    class="slds-m-right_small">
+                                                                </lightning-button>
+                                                                <lightning-button label="Delete Last Option"
+                                                                    onclick={deleteLastDependentOption}
+                                                                    data-main-index={index} data-dep-index={depIndex}>
+                                                                </lightning-button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                                
+                                            </div>
+                                            <!-- Delete Dependent Question Button -->
+                                                <lightning-button label="Delete Dependent Question"
+                                                    onclick={deleteDependentQuestion} data-main-index={index}
+                                                    data-dep-index={depIndex}
+                                                    class="slds-m-bottom_small">
+                                                </lightning-button><!--slds-m-top_small slds-button_destructive-->
+                                        </div>
+                                    </template>
+                                </template>
+                                <!-- Ended new code on 17-02-2025-->
+                                <!-- <br/> -->
+                                <!-- Delete Button for Each Row -->
+                                <lightning-button label="Delete" class="delete" style="width: auto;margin-top: 1rem;display: block;" data-index={index} onclick={deleteRow}>
+                                </lightning-button>
+                            </div>
+                        </template>
+                    </template>
+                    </br>
+                    <!-- Add Row Button -->
+                    <div class="slds-m-around_x-small n_add_new" align="center">
+                        <lightning-button label="Add Question" onclick={addRow} class="slds-m-bottom_small add_row">
+                        </lightning-button>
+                    </div>
+                    <div class="slds-text-align_center" style="padding-bottom: 70px;">
+                        <lightning-button label="Cancel" onclick={handlebacktolist} class="slds-m-left_x-small">
+                        </lightning-button>
+                        <lightning-button label="Save" onclick={submitData} class="slds-m-left_x-small">
+                        </lightning-button>
+                    </div>
+                </div>
+            </div>
+        </lightning-card>
+    </div>
+</template>

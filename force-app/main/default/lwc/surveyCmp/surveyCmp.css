@@ -1,0 +1,27 @@
+.custom-container{
+	color : black;
+}
+.slds-m-bottom_small {
+    margin-bottom: 0.5rem;
+}
+
+.slds-m-left_small {
+    margin-left: 0.5rem;
+}
+
+.slds-m-top_small {
+    margin-top: 0.5rem;
+}
+
+.slds-grid {
+    display: flex;
+    align-items: center;
+}
+
+.new-card{
+    padding: 0 25px !important;
+}
+.depeQues
+{
+    width: 100% !important;
+}
